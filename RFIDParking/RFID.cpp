@@ -21,14 +21,15 @@ void rfid_init(){
   Serial.println("THE RFID IS INITIALIZED!");
 }
 
-void writeFirstName(char firstName[16]){
+//Returns true if successfully written. Returns false if error occurs
+bool writeFirstName(char firstName[16]){
 
   MFRC522::StatusCode status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, firstNameBlock, &key, &(mfrc522.uid));
       
   if (status != MFRC522::STATUS_OK) {
     Serial.print("Authentication failed: ");
     Serial.println(mfrc522.GetStatusCodeName(status));
-    return;
+    return false;
   }
   status = mfrc522.MIFARE_Write(firstNameBlock, firstName, 16);
   if (status != MFRC522::STATUS_OK) {
@@ -36,19 +37,21 @@ void writeFirstName(char firstName[16]){
     Serial.println(mfrc522.GetStatusCodeName(status));
     mfrc522.PICC_HaltA();       // Reset card state
     mfrc522.PCD_StopCrypto1();  // Stop encryption on reader
-    return;
+    return false;
   } else {
     Serial.println("Success! Data written to block.");
+    return true;
   }
 }
 
-void writeLastName(char lastName[16]){
+//Returns true if successfully written. Returns false if error occurs
+bool writeLastName(char lastName[16]){
   MFRC522::StatusCode status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, lastNameBlock, &key, &(mfrc522.uid));
       
   if (status != MFRC522::STATUS_OK) {
     Serial.print("Authentication failed: ");
     Serial.println(mfrc522.GetStatusCodeName(status));
-    return;
+    return false;
   }
   status = mfrc522.MIFARE_Write(lastNameBlock, lastName, 16);
   if (status != MFRC522::STATUS_OK) {
@@ -56,12 +59,14 @@ void writeLastName(char lastName[16]){
     Serial.println(mfrc522.GetStatusCodeName(status));
     mfrc522.PICC_HaltA();       // Reset card state
     mfrc522.PCD_StopCrypto1();  // Stop encryption on reader
-    return;
+    return false;
   } else {
     Serial.println("Success! Data written to block.");
+    return true;
   }
 }
 
+//Returns empty string if error happens while reading.
 String readFirstName() {
   char buffer[18];
   byte bufferSize = sizeof(buffer);
@@ -69,14 +74,8 @@ String readFirstName() {
   if (status != MFRC522::STATUS_OK) {
     Serial.print("Read failed: ");
     Serial.println(mfrc522.GetStatusCodeName(status));
-  } else {
-    Serial.print("Block 4 Data: ");
-    for (byte i = 0; i < 16; i++) {
-      Serial.write(buffer[i]); // Prints the 16 characters as text
-    }
-    Serial.println();
-  }
-
+    return "";
+  } 
   // Overwrite index 16 (the first CRC byte) with a null terminator
   buffer[16] = '\0'; 
 
@@ -90,6 +89,7 @@ String readFirstName() {
 
 }
 
+//Returns empty string if error happens while reading.
 String readLastName(){
   char buffer[18];
   byte bufferSize = sizeof(buffer);
@@ -97,13 +97,8 @@ String readLastName(){
   if (status != MFRC522::STATUS_OK) {
     Serial.print("Read failed: ");
     Serial.println(mfrc522.GetStatusCodeName(status));
-  } else {
-    Serial.print("Block 5 Data: ");
-    for (byte i = 0; i < 16; i++) {
-      Serial.write(buffer[i]); // Prints the 16 characters as text
-    }
-    Serial.println();
-  }
+    return "";
+  } 
 
   // Overwrite index 16 (the first CRC byte) with a null terminator
   buffer[16] = '\0'; 

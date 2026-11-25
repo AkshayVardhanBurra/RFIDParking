@@ -15,9 +15,9 @@ extern byte lastNameBlock;
 
 void rfid_init();
 
-void writeFirstName(char firstName[16]);
+bool writeFirstName(char firstName[16]);
 
-void writeLastName(char lastName[16]);
+bool writeLastName(char lastName[16]);
 
 String readFirstName();
 
