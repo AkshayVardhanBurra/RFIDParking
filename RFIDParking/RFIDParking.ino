@@ -3,7 +3,7 @@
 #include <string.h>
 #include "RFID.h"
 
-// Data MUST be exactly 16 bytes long (pad with spaces or zeros if shorter)
+// Data MUST be exactly 16 bytes long (pad with spaces or zeros if shorter) when writing.
 byte firstName[16] = {"John            "};
 byte lastName[16] =  {"Dingle          "}; 
 
@@ -26,16 +26,21 @@ void loop() {
   }
 
   Serial.println();
+  //Write 16 byte data
   writeFirstName(firstName);
+
+  //Write 16 byte data
   writeLastName(lastName);
 
-
-  byte buffer[18];
-  byte bufferSize = sizeof(buffer);
+  //Read first name
   String firstName = readFirstName();
   Serial.println(firstName);
+
+  //Read last name
   String lastName = readLastName();
   Serial.println(lastName);
+
+  //Reset rfid card
   mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
   delay(1500);
